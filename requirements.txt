@@ -18,3 +18,4 @@ sentence-transformers==2.7.0
 langchain-chroma
 faiss-cpu
 lark
+streamlit==1.30.0
