@@ -55,9 +55,23 @@ def chat_window():
     # memory = chain.memory
     
     memory = st.session_state['memory']
-    mensagens = memory.load_memory_variables({})
+    mensagens = memory.load_memory_variables({})['history']
     
-    st.write(mensagens)
+    container = st.container()
+    for mensagem in mensagens:
+        chat = container.chat_message(mensagem.type)
+        chat.markdown(mensagem.content)
+    
+    nova_mensagem = st.chat_input('Converse com os seus documentos...')
+    if nova_mensagem:
+        chat = container.chat_message('human')
+        chat.markdown(nova_mensagem)
+        chat = container.chat_message('ai')
+        chat.markdown('Gerando resposta')
+        sleep(2)
+        memory.chat_memory.add_user_message(nova_mensagem)
+        memory.chat_memory.add_ai_message('Oi, é a LLM aqui novamente')
+        st.rerun()
     
 
 def main():
