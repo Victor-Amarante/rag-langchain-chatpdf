@@ -1,14 +1,26 @@
 import streamlit as st
 from pathlib import Path
 from time import sleep
+from langchain.memory import ConversationBufferMemory
 
+
+st.set_page_config(page_title="ChatBot PDF", layout="wide")
 
 FILES_DIR = Path(__name__).parent / 'files'
 
 
 def cria_chain_conversa():
     st.session_state['chain'] = True
+    
+    memory = ConversationBufferMemory(return_messages=True)
+    memory.chat_memory.add_user_message('Oi')
+    memory.chat_memory.add_ai_message('Oi, eu sou uma LLM')
+    
+    st.session_state['memory'] = memory
     sleep(1)
+    pass
+
+
 
 def sidebar():
     uploaded_pdfs = st.file_uploader('Selecione os arquivos PDF',
@@ -33,9 +45,25 @@ def sidebar():
             st.rerun()
 
 
+def chat_window():
+    st.header("Welcome to RAG ChatBot", divider=True)
+    if not 'chain' in st.session_state:
+        st.warning('Faça o upload de PDFs para começar')
+        st.stop()
+    
+    # chain = st.session_state['chain']
+    # memory = chain.memory
+    
+    memory = st.session_state['memory']
+    mensagens = memory.load_memory_variables({})
+    
+    st.write(mensagens)
+    
+
 def main():
     with st.sidebar:
         sidebar()
+    chat_window()
 
 
 if __name__ == '__main__':
